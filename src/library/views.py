@@ -3,7 +3,7 @@ from rest_framework import status, generics
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from library.models import Book
+from library.models import Book, UserInfo
 from library.serializers import BookSerializer, UserInfoSerializer
 from library.tasks import send_email_message_task
 
@@ -54,3 +54,12 @@ class UserInfoRegistrationView(APIView):
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserApiView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, pk):
+        user = UserInfo.objects.get(pk=pk)
+        serializer = UserInfoSerializer(user)
+        return Response(serializer.data)
