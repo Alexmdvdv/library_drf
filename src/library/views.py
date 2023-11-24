@@ -43,13 +43,20 @@ class BaseBookAPIView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class UserAPIView(generics.ListCreateAPIView):
+class RegisterUserAPIView(APIView):
     permission_classes = [AllowAny]
-    queryset = UserInfo.objects.all()
-    serializer_class = UserInfoSerializer
+
+    def post(self, request):
+        serializer = UserInfoSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            send_email_message_task.delay(serializer.data["username"], serializer.data["email"])
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class BaseUserAPIView(APIView):
+class UserAPIView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, pk):
