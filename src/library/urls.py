@@ -5,6 +5,6 @@ from library.views import BaseBookAPIView, BookAPIView, UserInfoRegistrationView
 urlpatterns = [
     path('library/<int:pk>/', BaseBookAPIView.as_view()),
     path('library/', BookAPIView.as_view()),
-    path('reader/', UserInfoRegistrationView.as_view()),
-    path('reader/<int:pk>/', UserApiView.as_view())
+    path('reader/register/', UserInfoRegistrationView.as_view()),
+    path('reader/<int:pk>/', UserApiView.as_view()),
 ]
