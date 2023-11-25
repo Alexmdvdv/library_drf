@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  django_app:
+    build: .
+    container_name: django
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/django
+    ports:
+      - '8000:8000'
+    env_file:
+      - .env
+    depends_on:
+      mysql_db:
+        # проверяет работоспособен mysql или нет
+        condition: service_healthy
+
+  mysql_db:
+    image: mysql:8
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    env_file:
+      - .env_db
+    volumes:
+      - ./db_django:/var/lib/mysql/
+    # healthcheck работает для проверки mysql(успел запуститься или нет),
+    # т.к была проблема с тем что django_app запускался быстрее и не мог подключиться к бд
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 10s
+      retries: 5
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6380:6379"
+
+  celery:
+    build: .
+    command: sh -c "celery -A config worker -l info"
+    depends_on:
+      - django_app
+      - mysql_db
+      - redis
