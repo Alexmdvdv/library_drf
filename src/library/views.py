@@ -1,6 +1,5 @@
 from django.http import Http404
 from rest_framework import status, generics
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from library.models import Book, UserInfo
@@ -9,13 +8,11 @@ from library.tasks import send_email_message_task
 
 
 class BookAPIView(generics.ListCreateAPIView):
-    permission_classes = [AllowAny]
     queryset = Book.objects.all()
     serializer_class = BookSerializer
 
 
 class BaseBookAPIView(APIView):
-    permission_classes = [AllowAny]
 
     def get_object(self, pk):
         try:
@@ -44,7 +41,10 @@ class BaseBookAPIView(APIView):
 
 
 class RegisterUserAPIView(APIView):
-    permission_classes = [AllowAny]
+    """
+    К комментарию в models.py, в заданий говорилось о регистарации без авторизации пользователя,
+    решил сделать так, возможно имелось ввиду "добавление" пользователя
+    """
 
     def post(self, request):
         serializer = UserInfoSerializer(data=request.data)
@@ -57,7 +57,6 @@ class RegisterUserAPIView(APIView):
 
 
 class UserAPIView(APIView):
-    permission_classes = [AllowAny]
 
     def get(self, request, pk):
         user = UserInfo.objects.get(pk=pk)
