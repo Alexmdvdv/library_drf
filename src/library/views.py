@@ -2,9 +2,8 @@ from django.http import Http404
 from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from library.models import Book, UserInfo
-from library.serializers import BookSerializer, UserInfoSerializer
-from library.tasks import send_email_message_task
+from library.models import Book
+from library.serializers import BookSerializer
 
 
 class BookAPIView(generics.ListCreateAPIView):
@@ -38,27 +37,3 @@ class BaseBookAPIView(APIView):
         book = self.get_object(pk)
         book.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class RegisterUserAPIView(APIView):
-    """
-    К комментарию в models.py, в заданий говорилось о регистарации без авторизации пользователя,
-    решил сделать так, возможно имелось ввиду "добавление" пользователя
-    """
-
-    def post(self, request):
-        serializer = UserInfoSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            send_email_message_task.delay(serializer.data["username"], serializer.data["email"])
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class UserAPIView(APIView):
-
-    def get(self, request, pk):
-        user = UserInfo.objects.get(pk=pk)
-        serializer = UserInfoSerializer(user)
-        return Response(serializer.data)
