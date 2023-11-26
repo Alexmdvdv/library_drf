@@ -44,6 +44,7 @@ Request:
     "title": "<title>",
 }
 ```
+
 ```
 Response: 
 
@@ -90,28 +91,31 @@ Request:
 }
 ```
 
-### GET: book/reader/int/
-
-```
-Response:
-
-{
-    "username": "<username>", 
-    "email": "<email>"
-
-}
-```
-
-### GET: book/reader/
+### POST: user/register/
 
 ```
 Request:
 
 {
     "username": "<username>", 
-    "email": "<email>"
+    "email": "<email>",
+    "password": "<password>"
 
 }
 ```
+
+```
+Response:
+
+{
+    "username": "<username>", 
+    "email": "<email>",
+    "refresh": "<refresh_token>",
+    "access": "<access_token>"
+
+}
+
+```
+
 
 
